@@ -181,6 +181,40 @@ td{padding:7px 10px;color:var(--tx);white-space:nowrap;vertical-align:middle}
 .required-star{color:var(--red2)}
 .score-hint{font-size:10px;color:var(--dim);margin-top:2px}
 .auto-field{background:var(--s3)!important;color:var(--teal2)!important;cursor:default}
+
+/* ── DATABASE MANAGER ── */
+.db-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.db-toolbar input,.db-toolbar select{background:var(--s2);border:1px solid var(--b1);
+  color:var(--tx);padding:7px 11px;border-radius:7px;font-size:11px;outline:none}
+.db-toolbar input:focus,.db-toolbar select:focus{border-color:var(--teal)}
+.edit-row{background:var(--s3)!important}
+.edit-row td input,.edit-row td select{background:var(--s2);border:1px solid var(--teal);
+  color:var(--tx);padding:3px 7px;border-radius:5px;font-size:11px;outline:none;width:100%;min-width:80px}
+.edit-row td select{min-width:90px}
+.icon-btn{background:none;border:none;cursor:pointer;padding:3px 6px;border-radius:4px;
+  font-size:13px;transition:all .12s;line-height:1}
+.icon-btn:hover{background:var(--s3)}
+.icon-btn.save:hover{color:#66BB6A}
+.icon-btn.cancel:hover{color:#FFA726}
+.icon-btn.edit:hover{color:#64B5F6}
+.icon-btn.del:hover{color:#EF5350;background:var(--red3)}
+.db-source-badge{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;
+  letter-spacing:.3px;white-space:nowrap}
+.src-base{background:rgba(10,123,128,0.2);color:#4DB6AC}
+.src-new{background:rgba(230,81,0,0.2);color:#FFB74D}
+.db-stats{display:flex;gap:16px;font-size:11px;color:var(--muted);padding:10px 0;border-bottom:1px solid var(--b1);margin-bottom:12px;flex-wrap:wrap}
+.db-stat-item strong{color:var(--tx)}
+/* Edit form modal */
+.edit-form-wrap{background:var(--s2);border:1px solid var(--teal);border-radius:10px;
+  padding:18px;margin-bottom:14px;display:none}
+.edit-form-wrap.visible{display:block}
+.edit-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px}
+.efg{display:flex;flex-direction:column;gap:4px}
+.efg label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.efg input,.efg select{background:var(--s3);border:1px solid var(--b1);color:var(--tx);
+  padding:7px 10px;border-radius:6px;font-size:11px;outline:none}
+.efg input:focus,.efg select:focus{border-color:var(--teal)}
+.efg input.auto{color:var(--teal2)!important;cursor:default}
 </style>
 </head>
 <body>
@@ -217,6 +251,9 @@ td{padding:7px 10px;color:var(--tx);white-space:nowrap;vertical-align:middle}
     <button class="nt" onclick="showView('newrecord')" data-view="newrecord">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>New Record
       <span class="nbadge" id="new-badge" style="background:#E65100">0</span>
+    </button>
+    <button class="nt" onclick="showView('database')" data-view="database">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Database
     </button>
   </div>
 </nav>
@@ -584,6 +621,104 @@ td{padding:7px 10px;color:var(--tx);white-space:nowrap;vertical-align:middle}
       No records saved yet. Fill the form above and click Save.
     </div>
   </div>
+</div>
+
+<!-- ════════════ DATABASE MANAGER ════════════ -->
+<div class="view" id="view-database">
+
+  <!-- Edit Panel (appears when editing a record) -->
+  <div class="edit-form-wrap" id="edit-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--teal2)">✏ Editing Record</div>
+      <button class="btn btn-ghost" onclick="cancelEdit()" style="padding:5px 12px;font-size:11px">Cancel</button>
+    </div>
+    <div class="edit-form-grid">
+      <div class="efg"><label>Name <span style="color:#EF5350">*</span></label><input type="text" id="ep-name"></div>
+      <div class="efg"><label>Badge</label><input type="text" id="ep-badge"></div>
+      <div class="efg"><label>Course <span style="color:#EF5350">*</span></label>
+        <select id="ep-course" onchange="epAutoOID()">
+          <option value="">— Select —</option>
+          <option>ESP Level 1</option><option>ESP Level 2</option><option>ESP Level 3</option>
+          <option>VSD Level 1</option><option>VSD Level 2</option>
+          <option>HPS Level 1</option><option>HPS Level 2</option>
+          <option>Application Level 1</option><option>Application Level 2</option>
+          <option>Application School</option>
+          <option>Troubleshooting Level 1</option><option>Troubleshooting Level 2</option>
+          <option>Troubleshooting &amp; Optimization School</option>
+          <option>Spectrum Vision Level 1</option><option>Spectrum Vision Level 2</option>
+          <option>Sales School</option><option>Survillance School</option>
+          <option>DIFA &amp; Reliability</option><option>Gassy Well Operations</option>
+          <option>PMM Training</option><option>ESP Cable Splicing</option><option>Other</option>
+        </select>
+      </div>
+      <div class="efg"><label>Location <span style="color:#EF5350">*</span></label>
+        <select id="ep-location" onchange="epAutoRegion();epAutoOID()">
+          <option value="">— Select —</option>
+          <option>DMM</option><option>Alex</option><option>KWT</option>
+          <option>Villa</option><option>Bogota</option><option>Virtual</option>
+        </select>
+      </div>
+      <div class="efg"><label>⚙ Region (auto)</label><input type="text" id="ep-region" readonly class="auto"></div>
+      <div class="efg"><label>Country <span style="color:#EF5350">*</span></label>
+        <select id="ep-country">
+          <option value="">— Select —</option>
+          <option>SA</option><option>KW</option><option>EG</option>
+          <option>CO</option><option>EC</option><option>MX</option>
+          <option>SS</option><option>IQ</option><option>LY</option>
+          <option>Congo</option><option>Sudan</option><option>Venz</option><option>OM</option>
+        </select>
+      </div>
+      <div class="efg"><label>Start Date <span style="color:#EF5350">*</span></label>
+        <input type="date" id="ep-start" onchange="epAutoOID()"></div>
+      <div class="efg"><label>End Date</label><input type="date" id="ep-end"></div>
+      <div class="efg"><label>Status <span style="color:#EF5350">*</span></label>
+        <select id="ep-status">
+          <option>Passed</option><option>Failed</option><option>Pending</option>
+        </select>
+      </div>
+      <div class="efg"><label>Score (0–100)</label><input type="number" id="ep-score" min="0" max="100" step="0.1"></div>
+      <div class="efg"><label>Hours</label><input type="number" id="ep-hours" min="0"></div>
+      <div class="efg"><label>Position</label><input type="text" id="ep-position"></div>
+      <div class="efg"><label>⚙ Offering ID</label><input type="text" id="ep-oid" readonly class="auto"></div>
+      <div class="efg"><label>Sequence (if 2nd+ run)</label>
+        <select id="ep-seq" onchange="epAutoOID()">
+          <option value="">(none)</option>
+          <option value="_2nd">_2nd</option><option value="_3rd">_3rd</option><option value="_4th">_4th</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-primary" onclick="commitEdit()">💾 Save Changes</button>
+      <button class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
+      <span id="ep-msg" style="font-size:12px;font-weight:600"></span>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="db-stats" id="db-stats"></div>
+
+  <!-- Toolbar -->
+  <div class="db-toolbar">
+    <input type="text" placeholder="🔍 Search name / course / offering ID..." id="db-srch" oninput="renderDB()" style="width:240px">
+    <select id="db-yr" onchange="renderDB()"><option value="">All Years</option></select>
+    <select id="db-reg" onchange="renderDB()"><option value="">All Regions</option></select>
+    <select id="db-sta" onchange="renderDB()"><option value="">All Statuses</option><option>Passed</option><option>Failed</option><option>Pending</option></select>
+    <select id="db-src" onchange="renderDB()">
+      <option value="">All Sources</option>
+      <option value="base">Base Data (887)</option>
+      <option value="new">My Additions</option>
+    </select>
+    <span class="fc" id="db-cnt"></span>
+    <button class="btn btn-ghost" onclick="exportDB()" style="margin-left:auto;font-size:11px;padding:6px 14px">⬇ Export All CSV</button>
+  </div>
+
+  <!-- Table -->
+  <div class="sc" style="padding:0;overflow:hidden">
+    <div class="tw" style="max-height:600px">
+      <table id="tbl-db"></table>
+    </div>
+  </div>
+
 </div>
 
 </main>
@@ -1292,6 +1427,8 @@ function initView(id){
       renderTrainees();break;
     case 'newrecord':
       initNewRecord();break;
+    case 'database':
+      initDB();break;
   }
 }
 
@@ -1533,6 +1670,384 @@ function initNewRecord(){
   rebuildSLM();
   renderSavedList();
   updateNewBadge();
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// OPTION A: EDIT saved records (new entries)
+// ════════════════════════════════════════════════════════════════════
+let editingId = null; // ID of record being edited in New Record form
+
+function editSavedRecord(id){
+  const arr = loadSaved();
+  const rec = arr.find(r=>r._id===id);
+  if(!rec) return;
+  // Switch to New Record tab
+  showView('newrecord');
+  // Pre-fill form
+  setVal('f-name',      rec.name);
+  setVal('f-badge',     rec.badge);
+  setVal('f-course',    rec.course);
+  setVal('f-location',  rec.location);
+  setVal('f-country',   rec.country);
+  setVal('f-start',     rec.startDate);
+  setVal('f-end',       rec.endDate||'');
+  setVal('f-status',    rec.status);
+  setVal('f-score',     rec.score||'');
+  setVal('f-hours',     rec.hours||'');
+  setVal('f-position',  rec.position||'');
+  setVal('f-grade',     rec.grade||'');
+  autoFillRegion();
+  autoFillOfferingId();
+  // Mark as editing
+  editingId = id;
+  // Update save button text
+  const btn = document.querySelector('.btn-primary[onclick="saveRecord()"]');
+  if(btn) btn.textContent = '💾 Update Record';
+  // Show cancel edit button
+  const form_msg = document.getElementById('form-msg');
+  if(form_msg){ form_msg.style.color='#64B5F6'; form_msg.textContent='✏ Editing existing record — make changes and click Update'; }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setVal(id,val){
+  const el=document.getElementById(id);
+  if(el && val!==undefined && val!==null) el.value=val;
+}
+
+// Patch saveRecord to handle edits
+const _origSaveRecord = saveRecord;
+function saveRecord(){
+  if(editingId!==null){
+    // Delete old, save new
+    const arr = loadSaved().filter(r=>r._id!==editingId);
+    editingId = null;
+    const btn = document.querySelector('.btn-primary[onclick="saveRecord()"]');
+    if(btn) btn.textContent = '💾 Save Record';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    rebuildSLM();
+  }
+  _origSaveRecord();
+}
+
+function cancelEditMode(){
+  editingId=null;
+  const btn=document.querySelector('.btn-primary[onclick="saveRecord()"]');
+  if(btn) btn.textContent='💾 Save Record';
+  const msg=document.getElementById('form-msg');
+  if(msg) msg.textContent='';
+  clearForm();
+}
+
+// Patch renderSavedList to add edit buttons
+const _origRenderSavedList = renderSavedList;
+function renderSavedList(){
+  const arr = loadSaved();
+  const cnt = document.getElementById('saved-count');
+  const list= document.getElementById('saved-list');
+  const none= document.getElementById('no-saved');
+  if(cnt) cnt.textContent='('+arr.length+' record'+(arr.length!==1?'s':'')+')';
+  if(!arr.length){
+    if(list) list.innerHTML='';
+    if(none) none.style.display='block';
+    return;
+  }
+  if(none) none.style.display='none';
+  if(!list) return;
+  list.innerHTML=arr.slice().reverse().map(r=>{
+    const sc=r.status;
+    const bc=sc==='Passed'?'b-pass':sc==='Failed'?'b-fail':'b-pend';
+    const regc=RC[r.region]||'var(--muted)';
+    return '<div class="rec-card">'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:12px;font-weight:600;margin-bottom:4px">'+r.name+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap">'
+      +'<span>'+r.course+'</span>'
+      +'<span style="color:'+regc+'">'+r.location+' · '+r.region+'</span>'
+      +'<span>'+r.startDate+'</span>'
+      +'<span class="b '+bc+'">'+r.status+'</span>'
+      +(r.score?'<span style="color:#14A8B0">Score: '+r.score+'</span>':'')
+      +'<span style="color:var(--dim);font-size:10px">'+r.oid+'</span>'
+      +'</div></div>'
+      +'<div style="display:flex;gap:4px;flex-shrink:0">'
+      +'<button class="icon-btn edit" onclick="editSavedRecord('+r._id+')" title="Edit this record">✏</button>'
+      +'<button class="icon-btn del"  onclick="deleteRecord('+r._id+')"   title="Delete this record">🗑</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// OPTION C: DATABASE MANAGER — edit/delete all 887 + saved records
+// ════════════════════════════════════════════════════════════════════
+
+// Master record store: merges base SLM + saved overrides
+// Key: oid+name → override object in localStorage
+const DB_OVERRIDES_KEY = 'navigate_pms_overrides_v1';
+const DB_DELETED_KEY   = 'navigate_pms_deleted_v1';
+
+function loadOverrides(){ try{return JSON.parse(localStorage.getItem(DB_OVERRIDES_KEY)||'{}')}catch(e){return{}} }
+function loadDeleted(){   try{return new Set(JSON.parse(localStorage.getItem(DB_DELETED_KEY)||'[]'))}catch(e){return new Set()} }
+function saveOverrides(o){ localStorage.setItem(DB_OVERRIDES_KEY, JSON.stringify(o)) }
+function saveDeleted(s){   localStorage.setItem(DB_DELETED_KEY, JSON.stringify([...s])) }
+
+// Build full DB record list from SLM + saved + overrides - deleted
+function buildDBRecords(){
+  const overrides = loadOverrides();
+  const deleted   = loadDeleted();
+  const saved     = loadSaved();
+
+  // Base records from SLM (original 887)
+  const base = BASE_SLM.map((r,i)=>({
+    _dbid: 'base_'+i,
+    _source: 'base',
+    name:     r[0], course:  r[1], location: r[2], region: r[3],
+    startDate:r[4], status:  r[5]==='P'?'Passed':r[5]==='F'?'Failed':'Pending',
+    score:    r[6], year:    r[7], oid:      r[8],
+    badge:'', country:'', hours:0, position:'', grade:'', endDate:'',
+  }));
+
+  // Saved (new) records
+  const savedRecs = saved.map(r=>({
+    _dbid: 'new_'+r._id,
+    _source: 'new',
+    _savedId: r._id,
+    name:r.name, badge:r.badge||'', course:r.course, location:r.location,
+    region:r.region, country:r.country||'', startDate:r.startDate?.slice(0,7)||r.startDate,
+    endDate:r.endDate||'', status:r.status, score:r.score, year:r.year,
+    hours:r.hours||0, position:r.position||'', grade:r.grade||'', oid:r.oid,
+  }));
+
+  // Merge: apply overrides, filter deleted
+  const all = [...base, ...savedRecs]
+    .filter(r=>!deleted.has(r._dbid))
+    .map(r=>{
+      const ov = overrides[r._dbid];
+      return ov ? {...r,...ov,_dbid:r._dbid,_source:r._source} : r;
+    });
+
+  return all;
+}
+
+let dbRecords = [];
+let editingDBId = null;
+
+function initDB(){
+  dbRecords = buildDBRecords();
+  populateDBSelects();
+  renderDBStats();
+  renderDB();
+}
+
+function populateDBSelects(){
+  const yrs=[...new Set(dbRecords.map(r=>r.year).filter(Boolean))].sort();
+  const yrEl=document.getElementById('db-yr');
+  if(yrEl) yrEl.innerHTML='<option value="">All Years</option>'+yrs.map(y=>'<option>'+y+'</option>').join('');
+  const regs=[...new Set(dbRecords.map(r=>r.region).filter(Boolean))].sort();
+  const regEl=document.getElementById('db-reg');
+  if(regEl) regEl.innerHTML='<option value="">All Regions</option>'+regs.map(r=>'<option>'+r+'</option>').join('');
+}
+
+function renderDBStats(){
+  const total=dbRecords.length;
+  const passed=dbRecords.filter(r=>r.status==='Passed').length;
+  const failed=dbRecords.filter(r=>r.status==='Failed').length;
+  const pr=passed+failed>0?Math.round(passed/(passed+failed)*100):0;
+  const edited=Object.keys(loadOverrides()).length;
+  const deleted=loadDeleted().size;
+  const added=loadSaved().length;
+  const el=document.getElementById('db-stats');
+  if(!el) return;
+  el.innerHTML=[
+    '<span>Total records: <strong>'+total+'</strong></span>',
+    '<span>Pass rate: <strong style="color:'+(pr>=80?'#66BB6A':pr>=65?'#FFA726':'#EF5350')+'">'+pr+'%</strong></span>',
+    '<span>Edited: <strong style="color:#64B5F6">'+edited+'</strong></span>',
+    '<span>Deleted: <strong style="color:#EF5350">'+deleted+'</strong></span>',
+    '<span>Added via form: <strong style="color:#FFB74D">'+added+'</strong></span>',
+    edited+deleted>0?'<button class="btn btn-ghost" onclick="resetAllOverrides()" style="font-size:10px;padding:4px 10px;margin-left:8px">↩ Reset all edits</button>':'',
+  ].join('');
+}
+
+function renderDB(){
+  const q=(document.getElementById('db-srch')?.value||'').toLowerCase();
+  const yr=document.getElementById('db-yr')?.value||'';
+  const reg=document.getElementById('db-reg')?.value||'';
+  const sta=document.getElementById('db-sta')?.value||'';
+  const src=document.getElementById('db-src')?.value||'';
+
+  const data=dbRecords.filter(r=>
+    (!yr||String(r.year)===yr)&&(!reg||r.region===reg)&&
+    (!sta||r.status===sta)&&(!src||r._source===src)&&
+    (!q||r.name.toLowerCase().includes(q)||r.course.toLowerCase().includes(q)||(r.oid||'').toLowerCase().includes(q)||(r.badge||'').includes(q)));
+
+  const el=document.getElementById('db-cnt');
+  if(el) el.textContent=data.length.toLocaleString()+' records';
+
+  const hs=['Source','Name','Course','Location','Reg','Date','Status','Score','Offering ID','Actions'];
+  let h='<thead><tr>'+hs.map(x=>'<th style="white-space:nowrap">'+x+'</th>').join('')+'</tr></thead><tbody>';
+
+  data.slice(0,500).forEach(r=>{
+    const isEditing = editingDBId===r._dbid;
+    const srcBadge = r._source==='base'
+      ? '<span class="db-source-badge src-base">Base</span>'
+      : '<span class="db-source-badge src-new">Added</span>';
+    const stBc = r.status==='Passed'?'b-pass':r.status==='Failed'?'b-fail':'b-pend';
+
+    if(isEditing){
+      h+='<tr class="edit-row">'
+        +'<td>'+srcBadge+'</td>'
+        +'<td><input id="ir-name" value="'+esc(r.name)+'"></td>'
+        +'<td><select id="ir-course">'+courseOpts(r.course)+'</select></td>'
+        +'<td><select id="ir-location" onchange="irAutoRegion()">'+locOpts(r.location)+'</select></td>'
+        +'<td><input id="ir-region" readonly value="'+(LOC_REG[r.location]||r.region||'')+'" style="color:var(--teal2);cursor:default;width:52px"></td>'
+        +'<td><input type="date" id="ir-start" value="'+(r.startDate?.length===7?r.startDate+'-01':r.startDate||'')+'" style="width:130px"></td>'
+        +'<td><select id="ir-status"><option'+(r.status==='Passed'?' selected':'')+'>Passed</option><option'+(r.status==='Failed'?' selected':'')+'>Failed</option><option'+(r.status==='Pending'?' selected':'')+'>Pending</option></select></td>'
+        +'<td><input type="number" id="ir-score" value="'+(r.score||'')+'" min="0" max="100" step="0.1" style="width:60px"></td>'
+        +'<td><input id="ir-oid" value="'+esc(r.oid||'')+'" style="color:var(--teal2)"></td>'
+        +'<td style="white-space:nowrap">'
+        +'<button class="icon-btn save" onclick="commitInlineEdit(''+r._dbid+'')" title="Save">✅</button>'
+        +'<button class="icon-btn cancel" onclick="cancelInlineEdit()" title="Cancel">✕</button>'
+        +'</td></tr>';
+    } else {
+      h+='<tr>'
+        +'<td>'+srcBadge+'</td>'
+        +'<td style="font-weight:500;min-width:130px;max-width:180px;overflow:hidden;text-overflow:ellipsis">'+esc(r.name)+'</td>'
+        +'<td style="max-width:155px;overflow:hidden;text-overflow:ellipsis">'+esc(r.course)+'</td>'
+        +'<td>'+esc(r.location)+'</td>'
+        +'<td>'+regB(r.region)+'</td>'
+        +'<td style="font-size:10px;color:var(--muted)">'+( r.startDate?.slice(0,7)||'—')+'</td>'
+        +'<td><span class="b '+stBc+'">'+r.status+'</span></td>'
+        +'<td>'+scoreBar(r.score)+'</td>'
+        +'<td style="font-size:10px;color:#14A8B0;max-width:150px;overflow:hidden;text-overflow:ellipsis">'+(r.oid||'—')+'</td>'
+        +'<td style="white-space:nowrap">'
+        +'<button class="icon-btn edit" onclick="startInlineEdit(''+r._dbid+'')" title="Edit">✏</button>'
+        +'<button class="icon-btn del"  onclick="dbDeleteRecord(''+r._dbid+'')" title="Delete">🗑</button>'
+        +'</td></tr>';
+    }
+  });
+
+  if(data.length>500) h+='<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:10px;font-style:italic">Showing 500 of '+data.length+' — use filters to narrow</td></tr>';
+  h+='</tbody>';
+  document.getElementById('tbl-db').innerHTML=h;
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function courseOpts(sel){ return Object.keys(CA).concat(['Other']).map(c=>'<option'+(c===sel?' selected':'')+'>'+esc(c)+'</option>').join(''); }
+function locOpts(sel){ return ['DMM','Alex','KWT','Villa','Bogota','Virtual'].map(l=>'<option'+(l===sel?' selected':'')+'>'+l+'</option>').join(''); }
+
+function irAutoRegion(){
+  const loc=document.getElementById('ir-location')?.value||'';
+  const el=document.getElementById('ir-region');
+  if(el) el.value=LOC_REG[loc]||'';
+}
+
+// ── Inline edit (in table) ────────────────────────────────────────
+function startInlineEdit(dbid){
+  editingDBId=dbid;
+  renderDB();
+  // Scroll to row
+  setTimeout(()=>document.querySelector('.edit-row')?.scrollIntoView({behavior:'smooth',block:'center'}),50);
+}
+function cancelInlineEdit(){ editingDBId=null; renderDB(); }
+
+function commitInlineEdit(dbid){
+  const name   = document.getElementById('ir-name')?.value.trim();
+  const course = document.getElementById('ir-course')?.value;
+  const loc    = document.getElementById('ir-location')?.value;
+  const start  = document.getElementById('ir-start')?.value;
+  const status = document.getElementById('ir-status')?.value;
+  if(!name||!course||!loc||!start||!status){ alert('Name, Course, Location, Date and Status are required.'); return; }
+  const scoreRaw=document.getElementById('ir-score')?.value;
+  const score=scoreRaw&&parseFloat(scoreRaw)>0?Math.round(parseFloat(scoreRaw)*10)/10:null;
+  const region=LOC_REG[loc]||document.getElementById('ir-region')?.value||'';
+  const d=new Date(start); const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monYY=months[d.getMonth()]+String(d.getFullYear()).slice(2);
+  const ca=CA[course]||course.replace(/\s+/g,'_').slice(0,10);
+  const oid=document.getElementById('ir-oid')?.value||ca+'_'+loc+'_'+monYY;
+  const startShort=start.slice(0,7);
+  const year=d.getFullYear();
+
+  // Save override
+  const overrides=loadOverrides();
+  overrides[dbid]={name,course,location:loc,region,startDate:startShort,status,score,year,oid};
+  saveOverrides(overrides);
+
+  // If it's a saved record (new), also update localStorage saved records
+  const rec=dbRecords.find(r=>r._dbid===dbid);
+  if(rec&&rec._source==='new'&&rec._savedId){
+    const arr=loadSaved();
+    const idx=arr.findIndex(r=>r._id===rec._savedId);
+    if(idx>=0) arr[idx]={...arr[idx],name,course,location:loc,region,startDate:start,status,score,year,oid,startShort,country:arr[idx].country||''};
+    saveSaved(arr);
+  }
+
+  editingDBId=null;
+  dbRecords=buildDBRecords();
+  rebuildSLM();
+  renderDBStats();
+  renderDB();
+  refreshActiveView();
+}
+
+// ── Panel edit (from Database tab top panel) ──────────────────────
+function epAutoRegion(){ const l=document.getElementById('ep-location')?.value||''; const el=document.getElementById('ep-region'); if(el)el.value=LOC_REG[l]||''; epAutoOID(); }
+function epAutoOID(){
+  const c=document.getElementById('ep-course')?.value||'';
+  const l=document.getElementById('ep-location')?.value||'';
+  const d=document.getElementById('ep-start')?.value||'';
+  const s=document.getElementById('ep-seq')?.value||'';
+  if(!c||!l||!d){const el=document.getElementById('ep-oid');if(el)el.value='';return;}
+  const ca=CA[c]||c.replace(/\s+/g,'_').slice(0,10);
+  const dt=new Date(d); const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const el=document.getElementById('ep-oid');
+  if(el)el.value=ca+'_'+l+'_'+ms[dt.getMonth()]+String(dt.getFullYear()).slice(2)+s;
+}
+
+// ── Delete from DB ────────────────────────────────────────────────
+function dbDeleteRecord(dbid){
+  if(!confirm('Delete this record? It will be removed from all charts.')) return;
+  // If it's a saved record, remove from localStorage too
+  const rec=dbRecords.find(r=>r._dbid===dbid);
+  if(rec&&rec._source==='new'&&rec._savedId){
+    const arr=loadSaved().filter(r=>r._id!==rec._savedId);
+    saveSaved(arr);
+    updateNewBadge();
+  } else {
+    // Base record: add to deleted set
+    const del=loadDeleted(); del.add(dbid); saveDeleted(del);
+  }
+  dbRecords=buildDBRecords();
+  rebuildSLM();
+  renderDBStats();
+  renderDB();
+  refreshActiveView();
+}
+
+// ── Reset all overrides ───────────────────────────────────────────
+function resetAllOverrides(){
+  if(!confirm('Reset ALL edits and deletions? This restores all original base records.')) return;
+  localStorage.removeItem(DB_OVERRIDES_KEY);
+  localStorage.removeItem(DB_DELETED_KEY);
+  dbRecords=buildDBRecords();
+  rebuildSLM();
+  renderDBStats();
+  renderDB();
+  refreshActiveView();
+}
+
+// ── Export full DB as CSV ─────────────────────────────────────────
+function exportDB(){
+  const hdr=['Source','Name','Badge','Course','Location','Region','Country','Start Date','Status','Score','Hours','Position','Offering ID','Year'];
+  const rows=dbRecords.map(r=>[
+    r._source==='base'?'Base':'Added',
+    r.name,r.badge||'',r.course,r.location,r.region,r.country||'',
+    r.startDate||'',r.status,r.score||'',r.hours||'',r.position||'',r.oid||'',r.year||''
+  ].map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(','));
+  const csv=[hdr.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='NAVIGATE_Full_DB_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
